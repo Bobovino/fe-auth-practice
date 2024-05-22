@@ -13,6 +13,7 @@ interface User {
 interface AuthState {
   user: User | null
   accessToken: string | null
+  isLoggingOut: boolean
   setAccessToken: (token: string) => void
   initialize: () => void
   renewAccessToken: () => Promise<boolean>
@@ -27,6 +28,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
+  isLoggingOut: false,
   setAccessToken: (token) => {
     set({ accessToken: token })
     localStorage.setItem('accessToken', token)
@@ -69,6 +71,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
   renewAccessToken: async () => {
+    if (get().isLoggingOut) {
+      return false
+    }
     try {
       const res = await axios.post(`${API_BASE_URL}/renewaccesstoken`, {}, { withCredentials: true })
       if (res.status === 200) {
@@ -143,8 +148,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return false
     }
   },
-  logout: () => {
-    set({ user: null, accessToken: null })
+  logout: async () => {
+    set({ isLoggingOut: true })
+    try {
+      await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true })
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+    set({ user: null, accessToken: null, isLoggingOut: false })
     localStorage.removeItem('accessToken')
     document.cookie = 'refreshToken=; Max-Age=0; path=/'
   },
