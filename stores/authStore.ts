@@ -20,6 +20,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<boolean>
   loginWithGoogle: () => void
   register: (username: string, email: string, password: string) => Promise<boolean>
+  verifyUser: (userId: string) => Promise<boolean>
   requestPasswordReset: (email: string) => Promise<boolean>
   resetPassword: (token: string, password: string) => Promise<boolean>
   logout: () => void
@@ -127,6 +128,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return false
     } catch (error) {
       console.error(error)
+      return false
+    }
+  },
+  verifyUser: async (userId) => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/verify/${userId}`)
+      return res.status === 200
+    } catch (error) {
+      console.error('Verification error:', error)
       return false
     }
   },

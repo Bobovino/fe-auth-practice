@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 
+//Interceptor made to revalidate tokens once the access token expires
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   withCredentials: true,

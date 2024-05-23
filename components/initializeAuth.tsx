@@ -1,5 +1,8 @@
 'use client'
 
+//This component is made so that the app checks if
+// the user is already logged in with tokens
+
 import { useEffect } from 'react'
 import { useAuthStore } from '../stores/authStore'
 
